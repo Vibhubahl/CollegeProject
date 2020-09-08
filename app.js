@@ -23,6 +23,20 @@ const userSchema = mongoose.Schema({
 
 const User = mongoose.model("User",userSchema);
 
+const bookSchema = mongoose.Schema({
+    name:String,
+    bid:String,
+    publisher:String,
+    author:String
+});
+
+const Book = mongoose.model("Book",bookSchema);
+
+var Vblock="none";
+var Vstatus="";
+var Warn="";
+var Mess="";
+
 app.get("/" , function(req,res)
 {
 	res.render("main");
@@ -45,6 +59,25 @@ app.get("/home" , function(req,res)
 		res.redirect("/signIn");
 	}
 	res.render("home" , {name:namme});
+})
+
+app.get("/logout" , function(req,res)
+{
+    isLoggedIn=false;
+    res.redirect("/");
+})
+
+app.get("/addBook" , function(req,res)
+{
+    if(!isLoggedIn)
+    {
+        res.redirect("/");
+    }
+    Vblock="none";
+    Vstatus="";
+    Warn="";
+    Mess="";
+    res.render("addBook" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
 })
 
 app.post("/register" , function(req,res)
@@ -112,6 +145,54 @@ app.post("/login" , function(req,res)
         }
     });
 })
+
+app.post("/subBook" , function(req,res)
+{
+    if(!isLoggedIn)
+    {
+        res.redirect("/");
+    }
+    var bname = req.body.Bname;
+    Book.findOne({name:bname} , function(err,foundBook)
+    {
+        if(err)
+        {
+            console.log(err);
+        }
+        if(foundBook)
+        {
+            Vstatus="visible";
+            Vblock="block";
+            Warn="danger";
+            Mess="Book Already Present";
+            res.render("addBook" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
+        }
+        else
+        {
+            const book = new Book({
+                name:req.body.Bname,
+                publisher:req.body.publisher,
+                bid:req.body.Bid,
+                author:req.body.author
+            })
+            book.save(function(err)
+            {
+                if(err)
+                {
+                    console.log(err);
+                }
+                else
+                {
+                    Vstatus="visible";
+                    Vblock="block";
+                    Warn="success";
+                    Mess="Book Successfully Added";
+                    res.render("addBook" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
+                }
+            });
+        };
+    });
+});
 
 app.listen(3000 ,function(req,res)
 {
