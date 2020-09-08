@@ -44,12 +44,20 @@ app.get("/" , function(req,res)
 
 app.get("/signIn" , function(req,res)
 {
-	res.render("signIn");
+    Vblock="none";
+    Vstatus="";
+    Warn="";
+    Mess="";
+    res.render("signIn" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
 });
 
 app.get("/signUp" , function(req,res)
 {
-	res.render("signUp");
+    Vblock="none";
+    Vstatus="";
+    Warn="";
+    Mess="";
+    res.render("signUp" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
 });
 
 app.get("/home" , function(req,res)
@@ -87,7 +95,11 @@ app.post("/register" , function(req,res)
     {
         if(found)
         {
-            res.render("register");
+            Vblock="block";
+            Vstatus="visible";
+            Warn="danger";
+            Mess="Email Id Already Registered";
+            res.render("signUp" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
         }
         else
         {
@@ -135,12 +147,20 @@ app.post("/login" , function(req,res)
                 }
                 else
                 {
-                    res.render("signIn");
+                    Vblock="block";
+                    Vstatus="visible";
+                    Warn="danger";
+                    Mess="Wrong Password";
+                    res.render("signIn" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
                 }
             }
             else
             {
-                res.render("signIn");
+                Vblock="block";
+                Vstatus="visible";
+                Warn="danger";
+                Mess="Email Id Not Registered";
+                res.render("signIn" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
             }
         }
     });
