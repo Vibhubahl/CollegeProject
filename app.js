@@ -23,6 +23,20 @@ const userSchema = mongoose.Schema({
 
 const User = mongoose.model("User",userSchema);
 
+const bookSchema = mongoose.Schema({
+    name:String,
+    quantity:String,
+    publisher:String,
+    author:String
+});
+
+const Book = mongoose.model("Book",bookSchema);
+
+var Vblock="none";
+var Vstatus="";
+var Warn="";
+var Mess="";
+
 app.get("/" , function(req,res)
 {
 	res.render("main");
@@ -30,12 +44,20 @@ app.get("/" , function(req,res)
 
 app.get("/signIn" , function(req,res)
 {
-	res.render("signIn");
+    Vblock="none";
+    Vstatus="";
+    Warn="";
+    Mess="";
+    res.render("signIn" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
 });
 
 app.get("/signUp" , function(req,res)
 {
-	res.render("signUp");
+    Vblock="none";
+    Vstatus="";
+    Warn="";
+    Mess="";
+    res.render("signUp" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
 });
 
 app.get("/home" , function(req,res)
@@ -43,8 +65,30 @@ app.get("/home" , function(req,res)
 	if(!isLoggedIn)
 	{
 		res.redirect("/signIn");
-	}
-	res.render("home" , {name:namme});
+    }
+    Book.find({} , function(err,foundBook)
+    {
+        res.render("home" , {name:namme , books:foundBook});
+    })
+})
+
+app.get("/logout" , function(req,res)
+{
+    isLoggedIn=false;
+    res.redirect("/");
+})
+
+app.get("/addBook" , function(req,res)
+{
+    if(!isLoggedIn)
+    {
+        res.redirect("/");
+    }
+    Vblock="none";
+    Vstatus="";
+    Warn="";
+    Mess="";
+    res.render("addBook" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
 })
 
 app.post("/register" , function(req,res)
@@ -54,7 +98,11 @@ app.post("/register" , function(req,res)
     {
         if(found)
         {
-            res.render("register");
+            Vblock="block";
+            Vstatus="visible";
+            Warn="danger";
+            Mess="Email Id Already Registered";
+            res.render("signUp" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
         }
         else
         {
@@ -102,16 +150,72 @@ app.post("/login" , function(req,res)
                 }
                 else
                 {
-                    res.render("signIn");
+                    Vblock="block";
+                    Vstatus="visible";
+                    Warn="danger";
+                    Mess="Wrong Password";
+                    res.render("signIn" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
                 }
             }
             else
             {
-                res.render("signIn");
+                Vblock="block";
+                Vstatus="visible";
+                Warn="danger";
+                Mess="Email Id Not Registered";
+                res.render("signIn" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
             }
         }
     });
 })
+
+app.post("/subBook" , function(req,res)
+{
+    if(!isLoggedIn)
+    {
+        res.redirect("/");
+    }
+    var bname = req.body.Bname;
+    Book.findOne({name:bname} , function(err,foundBook)
+    {
+        if(err)
+        {
+            console.log(err);
+        }
+        if(foundBook)
+        {
+            Vstatus="visible";
+            Vblock="block";
+            Warn="danger";
+            Mess="Book Already Present";
+            res.render("addBook" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
+        }
+        else
+        {
+            const book = new Book({
+                name:req.body.Bname,
+                publisher:req.body.publisher,
+                quantity:req.body.quantity,
+                author:req.body.author
+            })
+            book.save(function(err)
+            {
+                if(err)
+                {
+                    console.log(err);
+                }
+                else
+                {
+                    Vstatus="visible";
+                    Vblock="block";
+                    Warn="success";
+                    Mess="Book Successfully Added";
+                    res.render("addBook" , {vblock:Vblock, vstatus:Vstatus, warn:Warn , mess:Mess});
+                }
+            });
+        };
+    });
+});
 
 app.listen(3000 ,function(req,res)
 {
