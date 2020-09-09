@@ -25,7 +25,7 @@ const User = mongoose.model("User",userSchema);
 
 const bookSchema = mongoose.Schema({
     name:String,
-    bid:String,
+    quantity:String,
     publisher:String,
     author:String
 });
@@ -65,8 +65,11 @@ app.get("/home" , function(req,res)
 	if(!isLoggedIn)
 	{
 		res.redirect("/signIn");
-	}
-	res.render("home" , {name:namme});
+    }
+    Book.find({} , function(err,foundBook)
+    {
+        res.render("home" , {name:namme , books:foundBook});
+    })
 })
 
 app.get("/logout" , function(req,res)
@@ -192,7 +195,7 @@ app.post("/subBook" , function(req,res)
             const book = new Book({
                 name:req.body.Bname,
                 publisher:req.body.publisher,
-                bid:req.body.Bid,
+                quantity:req.body.quantity,
                 author:req.body.author
             })
             book.save(function(err)

@@ -13,5 +13,14 @@
     <hr>
     <a href="/addBook">Add Book</a>
     <a href="/logout">Logout</a>
+    <hr>
+    <h1 class="text-center">ALL BOOKS</h1>
+        <% books.forEach(function(book) { %>
+            <label for="title">Title :</label><p> <%= book.name %> </p>
+            <label for="author">Author :</label><p> <%= book.author %> </p>
+            <label for="ID">Quantity :</label><p> <%= book.quantity %> </p>
+            <label for="publication">Publication :</label><p> <%= book.publisher %> </p>
+            <hr>
+       <% }) %>
 </body>
 </html>
